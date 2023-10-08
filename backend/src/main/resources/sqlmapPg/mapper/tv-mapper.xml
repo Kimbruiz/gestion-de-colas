@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="essalud.gob.pe.gestionatencionservice.my_repository.TvMyRepository">
+
+    <select id="getPersonaCola" parameterType="map" resultType="TvPersonaColaDto">
+        SELECT
+            row_number() OVER (ORDER BY
+                <if test="tipoOficina == 1 or tipoOficina == 2">
+                    t.id_ticket ASC
+                </if>
+                <if test="tipoOficina == 3">
+                    t.id_ticket DESC
+                </if>
+            ) as orden,
+            p.tipo_doc,
+            p.num_doc,
+            CASE
+                WHEN (t.tipo_registro = 1) THEN p.pri_nombre || ' ' || LEFT(p.ape_paterno,1) || '.'
+                WHEN (t.tipo_registro = 2 and (ofi.tipo = 1 or ofi.tipo = 3)) THEN p.num_doc
+                WHEN (t.tipo_registro = 2 and ofi.tipo = 2) THEN '#' || t.num_aten
+            END as nombres,
+            TO_CHAR(t.fecha_registro,'HH12:MI AM') as fecha,
+            TO_CHAR(t.fecha_salida,'HH12:MI AM') as horaSalida,
+            t.ventanilla,
+            TO_CHAR(t.fecha_registro, 'DD/MM/YYYY') as fechaRegistro,
+            <choose>
+                <when test="tipoOficina == 1 or tipoOficina == 2">
+                    null as foto
+                </when>
+                <when test="tipoOficina == 3">
+                    p.foto as foto
+                </when>
+            </choose>
+        FROM ticket t
+        INNER JOIN persona p ON p.id_persona = t.id_persona
+        INNER JOIN oficina ofi ON ofi.id_oficina = t.id_oficina
+        WHERE (t.tipo = 0 AND (t.estado = 1 OR t.estado = 2) and ofi.estado = 1)
+          AND t.fecha_registro::date BETWEEN
+            timezone('America/Lima', now())::date - make_interval(days := ofi.max_dias_antiguedad) AND
+            timezone('America/Lima', now())::date
+          AND t.id_oficina = #{idOficina}
+        ORDER BY
+        <if test="tipoOficina == 1 or tipoOficina == 2">
+            t.id_ticket ASC
+        </if>
+        <if test="tipoOficina == 3">
+            coalesce(t.fecha_salida,t.fecha_salida,t.fecha_registro) desc
+        </if>
+    </select>
+
+    <!-- NO SE USA DE MOMENTO -->
+    <select id="getConsultaExterna" parameterType="map" resultType="TvConsultaExternaDto">
+        select
+            t.cod_ticket,
+            p.tipo_doc,
+            p.num_doc,
+            (p.apellidos || ', ' || p.nombres) as nombres,
+            TO_CHAR(t.fecha_registro,'DD/MM/YYYY - HH12:MI AM') as fecha,
+            tce.serv_hosp
+        from ticket t
+        inner join persona p on p.id_persona = t.id_persona
+        inner join ticket_consulta_externa tce on tce.id_ticket = t.id_ticket
+        where (t.tipo = 1 and t.estado = 1)
+            and t.cod_ori_centro = #{codOriCentro}
+            and t.cod_red = #{codRed}
+            and t.cod_centro = #{codCentro}
+    </select>
+
+    <!-- NO SE USA DE MOMENTO -->
+    <select id="getFarmacia" parameterType="map" resultType="TvFarmaciaDto">
+        select
+            t.cod_ticket,
+            p.tipo_doc,
+            p.num_doc,
+            (p.apellidos || ', ' || p.nombres) as nombres,
+            TO_CHAR(t.fecha_registro,'DD/MM/YYYY - HH12:MI AM') as fecha
+        from ticket t
+        inner join persona p on p.id_persona = t.id_persona
+        where (t.tipo = 2 and t.estado = 1)
+            and t.cod_ori_centro = #{codOriCentro}
+            and t.cod_red = #{codRed}
+            and t.cod_centro = #{codCentro}
+    </select>
+
+</mapper>

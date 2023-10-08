@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="essalud.gob.pe.gestionatencionservice.my_repository.UsuarioMyRepository">
+
+    <select id="getUsuariosOficina" parameterType="map" resultType="UsuarioOficinaDto">
+        select
+            ou.id_oficina,
+            ou.guiid,
+            o.nombre as oficina,
+            ou.usuario,
+            ou.nombres
+        from oficina_usuario ou
+        inner join oficina o on o.id_oficina = ou.id_oficina
+        where ou.estado = 1 and UPPER(CONCAT(ou.usuario,' ',COALESCE(ou.nombres,''))) like CONCAT('%', UPPER(#{filter}), '%')
+
+        <if test="id != null and id != -1">
+            and ou.id_oficina = #{id}
+        </if>
+    </select>
+
+</mapper>

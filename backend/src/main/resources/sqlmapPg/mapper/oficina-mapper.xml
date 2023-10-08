@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="essalud.gob.pe.gestionatencionservice.my_repository.OficinaMyRepository">
+
+    <select id="getOficinaByUsuarioGuiid" parameterType="String" resultType="GetOficinaDto">
+        select
+            o.id_oficina as codigo,
+            o.codigo as codViva,
+            o.cod_ospe,
+            o.nombre,
+            o.ventanillas,
+            o.tipo
+        from oficina o
+        inner join oficina_usuario ou on ou.id_oficina = o.id_oficina
+        where (o.estado = 1 and ou.estado = 1)
+          and ou.guiid = #{guiidUsuario}
+        limit 1
+    </select>
+
+    <select id="getOficinasCountByUsuario" parameterType="String" resultType="Long">
+        select count(ou.id_oficina)
+        from oficina_usuario ou
+        where ou.estado = 1 and ou.usuario = #{usuario}
+    </select>
+
+    <select id="getCombo" resultType="OficinaItemDto">
+        select
+            codigo as codViva,
+            id_oficina as codigo,
+            nombre
+        from oficina
+        where estado = 1 and tipo = 1
+        order by nombre asc
+    </select>
+
+    <select id="getList" parameterType="String" resultType="OficinaListItemDto">
+        select
+            id_oficina,
+            codigo,
+            nombre,
+            cod_ospe,
+            ventanillas,
+            max_dias_antiguedad,
+            tipo
+        from oficina
+        where estado = 1 and UPPER(CONCAT(codigo,' ',nombre)) like CONCAT('%', UPPER(#{filter}), '%')
+        order by nombre asc
+    </select>
+
+</mapper>

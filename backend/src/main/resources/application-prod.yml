@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://10.0.1.27:5432/gestion_atencion_db
+    jdbc-url: jdbc:postgresql://10.0.1.27:5432/gestion_atencion_db
+    username: usr_essalud
+    password: Essalud2020
+  jpa:
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: false
+
+base-url:
+  essi-consulta: http://10.56.1.158/SgssConsRepo/rest/
+  essi-paciente: http://10.56.1.158/SgssPaciente/rest/
+  ide-api: http://appsqa.essalud.gob.pe/ideapi
+
+sso:
+  url: http://apps.essalud.gob.pe/sso-main/api
+  app-key: 1ddd7536-e95e-479e-9571-d820dc583d89
+
+tv-video-folder: /var/fileserver/gestion-atencion/tv-video/

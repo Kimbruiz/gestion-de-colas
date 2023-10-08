@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="essalud.gob.pe.gestionatencionservice.my_repository.OperadorMyRepository">
+
+    <select id="getPersonaCola" parameterType="map" resultType="OpPersonaColaDto">
+        select
+            row_number() OVER (ORDER BY t.id_ticket) as orden,
+            t.guiid,
+            p.tipo_doc,
+            p.num_doc,
+            CASE
+                WHEN (t.tipo_registro = 1) THEN TRIM(p.pri_nombre || ' ' || COALESCE(p.seg_nombre,'')) || ', ' || TRIM(p.ape_paterno || ' ' || COALESCE(p.ape_materno,''))
+                WHEN (t.tipo_registro = 2 and (ofi.tipo = 1 or ofi.tipo = 3)) THEN p.num_doc
+                WHEN (t.tipo_registro = 2 and ofi.tipo = 2) THEN '#' || t.num_aten
+            END as nombres,
+            TO_CHAR(t.fecha_registro,'HH12:MI AM') as fecha,
+            t.ventanilla,
+            case when t.guiid_operador = #{guiidOperador} then true else false end as atendiendo,
+            TO_CHAR(t.fecha_registro, 'DD/MM/YYYY') as fechaRegistro
+        from ticket t
+        inner join persona p on p.id_persona = t.id_persona
+        INNER JOIN oficina ofi ON ofi.id_oficina = t.id_oficina
+        where (t.tipo = 0 and (t.estado = 1 or t.estado = 2) and ofi.estado = 1)
+          AND t.fecha_registro::date BETWEEN
+            timezone('America/Lima', now())::date - make_interval(days := ofi.max_dias_antiguedad) AND
+            timezone('America/Lima', now())::date
+          AND t.id_oficina = #{idOficina}
+        order by t.id_ticket asc
+    </select>
+
+    <select id="getTicketEnAtencion" parameterType="map" resultType="OpTicketEnAtencionDto">
+        select
+            t.guiid,
+            p.tipo_doc,
+            p.num_doc,
+            CASE
+                WHEN (t.tipo_registro = 1) THEN TRIM(p.pri_nombre || ' ' || COALESCE(p.seg_nombre,'')) || ', ' || TRIM(p.ape_paterno || ' ' || COALESCE(p.ape_materno,''))
+                WHEN (t.tipo_registro = 2 and (ofi.tipo = 1 or ofi.tipo = 3)) THEN p.num_doc
+                WHEN (t.tipo_registro = 2 and ofi.tipo = 2) THEN '#' || t.num_aten
+            END as nombres,
+            TO_CHAR(t.fecha_registro,'HH12:MI AM') as fecha,
+            t.ventanilla
+        from ticket t
+        inner join persona p on p.id_persona = t.id_persona
+        INNER JOIN oficina ofi ON ofi.id_oficina = t.id_oficina
+        where ((t.tipo = 0 and t.estado = 2) and ofi.estado = 1)
+          AND t.fecha_registro::date BETWEEN
+            timezone('America/Lima', now())::date - make_interval(days := ofi.max_dias_antiguedad) AND
+            timezone('America/Lima', now())::date
+          and t.guiid_operador = #{guiidOperador}
+          and t.id_oficina = #{idOficina}
+        order by t.id_ticket asc
+        limit 1
+    </select>
+
+    <select id="getPersonaTicket" parameterType="String" resultType="OpPersonaTicket">
+        select
+            p.tipo_doc,
+            p.num_doc,
+            TRIM(p.pri_nombre || ' ' || p.seg_nombre) as nombres,
+            TRIM(p.ape_paterno || ' ' || p.ape_materno) as apellidos,
+            p.genero,
+            TO_CHAR(p.fec_nacimiento,'DD/MM/YYYY') as fec_nacimiento,
+            EXTRACT(YEAR FROM AGE(timezone('America/Lima', now()), p.fec_nacimiento)) AS edad,
+            TO_CHAR(t.fecha_registro,'DD/MM/YYYY') as fecha,
+            TO_CHAR(t.fecha_registro,'HH12:MI AM') as hora,
+            ofi.nombre as oficina,
+            t.num_aten,
+            t.tipo_registro
+        from ticket t
+        inner join persona p on t.id_persona = p.id_persona
+        inner join oficina ofi on ofi.id_oficina = t.id_oficina
+        where p.estado = 1 and ofi.estado = 1
+          and t.guiid = #{guiidTicket}
+        limit 1
+    </select>
+
+</mapper>

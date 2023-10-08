@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="essalud.gob.pe.gestionatencionservice.my_repository.TicketMyRepository">
+
+    <select id="getSiguienteTicket" parameterType="map" resultType="String">
+        select
+            t.guiid
+        from ticket t
+        INNER JOIN oficina ofi ON ofi.id_oficina = t.id_oficina
+        where ((t.tipo = 0 and t.estado = 1) and ofi.estado = 1)
+          AND t.fecha_registro::date BETWEEN
+            timezone('America/Lima', now())::date - make_interval(days := ofi.max_dias_antiguedad) AND
+            timezone('America/Lima', now())::date
+          and t.id_oficina = #{idOficina}
+        order by t.id_ticket asc
+        limit 1
+    </select>
+
+    <select id="getTicketActivoEnAtencion" parameterType="map" resultType="TicketActivoEnAtencionDto">
+        select
+            t.guiid,
+            p.tipo_doc,
+            p.num_doc,
+            CASE
+                WHEN (t.tipo_registro = 1) THEN TRIM(p.pri_nombre || ' ' || COALESCE(p.seg_nombre,'')) || ', ' || TRIM(p.ape_paterno || ' ' || COALESCE(p.ape_materno,''))
+                WHEN (t.tipo_registro = 2 and (ofi.tipo = 1 or ofi.tipo = 3)) THEN p.num_doc
+                WHEN (t.tipo_registro = 2 and ofi.tipo = 2) THEN '#' || t.num_aten
+            END as nombres,
+            TO_CHAR(t.fecha_registro,'HH12:MI AM') as fecha,
+            t.ventanilla,
+            t.estado
+        from ticket t
+        inner join persona p on p.id_persona = t.id_persona
+        INNER JOIN oficina ofi ON ofi.id_oficina = t.id_oficina
+        where (t.tipo = 0 and (t.estado = 1 or t.estado = 2) and ofi.estado = 1)
+          AND t.fecha_registro::date BETWEEN
+            timezone('America/Lima', now())::date - make_interval(days := ofi.max_dias_antiguedad) AND
+            timezone('America/Lima', now())::date
+          and p.tipo_doc = #{tipoDoc}
+          and p.num_doc = #{numDoc}
+          and t.id_oficina = #{idOficina}
+        order by t.id_ticket desc
+        limit 1
+    </select>
+
+    <select id="getTicketActivoSinSalida" parameterType="map" resultType="TicketActivoEnAtencionDto">
+        select
+            t.guiid,
+            p.tipo_doc,
+            p.num_doc,
+            CASE
+                WHEN (t.tipo_registro = 1) THEN TRIM(p.pri_nombre || ' ' || COALESCE(p.seg_nombre,'')) || ', ' || TRIM(p.ape_paterno || ' ' || COALESCE(p.ape_materno,''))
+                WHEN (t.tipo_registro = 2 and (ofi.tipo = 1 or ofi.tipo = 3)) THEN p.num_doc
+                WHEN (t.tipo_registro = 2 and ofi.tipo = 2) THEN '#' || t.num_aten
+            END as nombres,
+            TO_CHAR(t.fecha_registro,'HH12:MI AM') as fecha,
+            t.ventanilla,
+            t.estado
+        from ticket t
+        inner join persona p on p.id_persona = t.id_persona
+        INNER JOIN oficina ofi ON ofi.id_oficina = t.id_oficina
+        where (t.tipo = 0 and (t.estado = 1 or t.estado = 2) and ofi.estado = 1)
+          AND t.fecha_registro::date = timezone('America/Lima', now())::date
+          and p.tipo_doc = #{tipoDoc}
+          and p.num_doc = #{numDoc}
+          and t.id_oficina = #{idOficina}
+          and t.fecha_salida is null
+        order by t.id_ticket desc
+        limit 1
+    </select>
+
+    <select id="getAsistentesCount" parameterType="Long" resultType="Long">
+        SELECT count(distinct t.id_persona)
+        FROM Ticket t
+        INNER JOIN oficina ofi ON ofi.id_oficina = t.id_oficina
+        WHERE (t.estado = 1 or t.estado = 2) and ofi.estado = 1
+          and t.fecha_salida is null
+          and ofi.id_oficina = #{idOficina}
+          and t.fecha_registro::date = timezone('America/Lima', now())::date
+    </select>
+
+</mapper>

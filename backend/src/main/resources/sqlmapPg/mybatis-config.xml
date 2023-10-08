@@ -1,0 +1,42 @@
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "HTTP://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="false"/>
+        <setting name="useGeneratedKeys" value="true"/>
+        <setting name="defaultExecutorType" value="REUSE"/>
+        <setting name="aggressiveLazyLoading" value="false"/>
+
+        <setting name="lazyLoadingEnabled" value="false"/>
+        <setting name="lazyLoadTriggerMethods" value=""/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="jdbcTypeForNull" value="NVARCHAR"/>
+        <setting name="logImpl" value="LOG4J2"/>
+    </settings>
+
+    <typeAliases>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.tv.TvPersonaColaDto" alias="TvPersonaColaDto"/>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.tv.TvConsultaExternaDto" alias="TvConsultaExternaDto"/>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.tv.TvFarmaciaDto" alias="TvFarmaciaDto"/>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.operador.OpPersonaColaDto" alias="OpPersonaColaDto"/>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.operador.OpTicketEnAtencionDto" alias="OpTicketEnAtencionDto"/>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.operador.OpPersonaTicket" alias="OpPersonaTicket"/>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.ticket.TicketActivoEnAtencionDto" alias="TicketActivoEnAtencion"/>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.oficina.GetOficinaDto" alias="GetOficinaDto"/>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.oficina.OficinaItemDto" alias="OficinaItemDto"/>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.oficina.OficinaListItemDto" alias="OficinaListItemDto"/>
+        <typeAlias type="essalud.gob.pe.gestionatencionservice.dto.usuario.UsuarioOficinaDto" alias="UsuarioOficinaDto"/>
+    </typeAliases>
+
+    <typeHandlers>
+    </typeHandlers>
+
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <property name="helperDialect" value="postgresql"/>
+            <property name="offsetAsPageNum" value="true"/>
+            <property name="rowBoundsWithCount" value="true"/>
+            <property name="pageSizeZero" value="true"/>
+            <property name="reasonable" value="true"/>
+        </plugin>
+    </plugins>
+</configuration>
