@@ -1,0 +1,192 @@
+.centro{
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+}
+.cardPrograma{
+    width: 100%;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    padding: 1.5rem;
+    background: white;
+    border-width: 1px;
+    border-radius: 1.5rem;
+}
+.data:nth-child(odd){
+    .centro{
+        background-color: rgb(242 250 253);
+    }
+}
+.data:nth-child(even){
+    .centro{
+        background-color: #dce7ee;
+    }
+}
+.sh{
+    height: 2.2rem;
+    margin-right: 0.4rem;
+}
+.choosen{
+    .centro{
+        background-color: rgb(16 121 168) !important;
+        color: white;
+    }
+}
+.contenedor{
+    height: 60vh;
+    overflow: auto;
+}
+
+.bajo, .logo, .titulo{
+    text-align: -webkit-center;
+}
+.page{
+    margin-left: 1rem;
+    margin-right: 1rem;
+    height: 100%;
+    display: grid;
+    align-content: space-evenly;
+    align-items: stretch;
+}
+
+.bajo{
+    img{
+        width: 32vw;
+    }
+}
+.logo{
+    img{
+        width: 16vw;
+    }
+}
+.titulo{
+    img{
+        width: 48vw;
+    }
+}
+.pageHeaderTele{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 2rem 1rem 2rem;
+}
+.contenedorCards{
+    display: flex;
+}
+
+.daySelected{
+    color: white;
+    background: linear-gradient(90deg, rgba(23,132,198,1) 35%, rgba(30,175,229,1) 100%);
+}
+.noSelected{
+    background: linear-gradient(90deg, rgba(178,211,237,1) 12%, rgba(238,241,244,1) 100%);
+    color: #1458a2;
+}
+.bgTituloAdaptable{
+    background-color: #1eaee4 !important;
+}
+
+.opcionesSelec{
+    border: solid #1458a2;
+    font-size: 1.8rem;
+    line-height: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    border-radius: 0.5rem;
+}
+
+.pad-mid{
+    padding: 0.25rem 0.5rem;
+}
+.headerCard{
+    display: flex;
+    align-items: center;
+}
+@media screen and (max-width: 436px){
+    .contenedor{
+        height: 56vh;
+    }
+    .bajo{
+        img{
+            width: 49vw;
+        }
+    }
+    .logo{
+        img{
+            width: 23vw;
+        }
+    }
+    .titulo{
+        img{
+            width: 54vw;
+        }
+    }
+}
+
+@media screen and (min-width: 1000px){
+    .cardPrograma{
+        font-size: 1.2rem;
+        line-height: 1.7rem;
+    }
+    .titulo{
+        img{
+            width: 55vw;
+        }
+    }
+    .logo{
+        img{
+            width: 25vw;
+        }
+    }
+    .bajo{
+        img{
+            width: 44vw;
+        }
+    }
+}
+
+@media screen and (min-width: 1500px){
+    .contenedor{
+        height: 60vh;
+    }
+    .cardPrograma{
+        font-size: 0.7rem;
+        line-height: 0.8rem;
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
+        padding-bottom: 0;
+    }
+    .page{
+        align-content: normal;
+        align-items: normal;
+    }
+    .bajo{
+        margin-top: 0.5rem;
+        img{
+            width: 12vw;
+        }
+    }
+    .logo{
+        img{
+            width: 25vw;
+        }
+    }
+    .titulo{
+        img{
+            width: 31vw;
+        }
+    }
+    .headerCard{
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        --tw-text-opacity: 1;
+        color: rgb(3 105 161 / var(--tw-text-opacity));
+    }
+    .sh{
+        height:1.25rem;
+    }
+}
